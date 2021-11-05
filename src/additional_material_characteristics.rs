@@ -1,4 +1,5 @@
 //! Information about the material's nature.
+//! Mostly fills field 6.
 
 use num_enum::FromPrimitive;
 
@@ -89,6 +90,80 @@ pub enum AdditionalMaterialCharacteristics {
 		/// Position 16-17.
 		special_format_characteristics: [SpecialFormatCharacteristics; 2],
 	},
+	/// Many materials.
+	MixedMaterials {
+		/// The form of the item(s).
+		/// Position 6.
+		form_of_item: FormOfItem,
+	},
+	/// Music.
+	Music {
+		/// Whether the sound is notated.
+		/// Implies musical.
+		/// Position 0, i+j = false, c+d = true.
+		recorded: bool,
+		/// Whether the sound is a manuscript.
+		/// Implies notated and musical.
+		/// Position 0, d = true, otherwise false.
+		manuscript: bool,
+		/// Whether the sound is musical.
+		/// Position 0, i = false, otherwise true.
+		musical: bool,
+		/// Form of composition.
+		/// Position 1-2.
+		form_of_composition: FormOfComposition,
+		/// Format of the music or sound recording.
+		/// Position 3.
+		format_of_music: FormatOfMusic,
+		/// The parts the music contains.
+		/// Position 4.
+		parts: MusicParts,
+		/// Target audience.
+		/// Position 5.
+		target_audience: TargetAudience,
+		/// Form of item.
+		/// Position 6.
+		form_of_item: FormOfItem,
+		/// Accompanying matter,
+		/// Position 7-12.
+		accompanying_matter: [AccompanyingMatter; 6],
+		/// Literary text.
+		/// Position 13-14.
+		literary_text: [MusicText; 2],
+		/// Transposition and arrangement.
+		/// Position 16.
+		transposition_and_arrangement: TranspositionArrangement,
+	},
+	/// Continuing resources.
+	ContinuingResources {
+		/// The frequency at which the resource is published.
+		/// Position 1.
+		frequency: Frequency,
+		/// The regularity with which the resource is published.
+		/// Position 2.
+		regularity: Regularity,
+		/// Form of the original item.
+		/// Position 5.
+		form_of_original: FormOfItem,
+		/// Form of the current item.
+		/// Position 6.
+		form_of_current: FormOfItem,
+		/// The nature of the work.
+		/// Position 7.
+		nature_of_work: NatureOfContents,
+		/// The nature of the work's contents.
+		/// Positions 8-10.
+		nature_of_content: [NatureOfContents; 3],
+		/// The type of government publication, if any.
+		/// Position 11.
+		government_publication: GovernmentPublication,
+		/// The type of conference publication, if any.
+		/// Position 12.
+		conference_publication: ConferencePublication,
+		/// The original alphabet or script.
+		/// Position 16.
+		original_alphabet_or_script: AlphabetScript,
+	},
 }
 
 /// The types of illustrations the book has.
@@ -173,6 +248,8 @@ pub enum FormOfItem {
 	Microopaque = b'c',
 	/// The book is in large print.
 	LargePrint = b'd',
+	/// e - Newspaper format
+	Newspaper = b'e',
 	/// The book is in Braille.
 	Braille = b'f',
 	/// The book is available online
@@ -603,6 +680,485 @@ pub enum SpecialFormatCharacteristics {
 	LooseLeaf = b'r',
 	/// z - Other
 	Other = b'z',
+	/// | - No attempt to code
+	#[default]
+	NotCoded = b'|',
+}
+
+/// The form of the composition.
+/// Oh boy, another two-letter code, that means more spaghetti.
+#[derive(Debug, Eq, PartialEq, IntoPrimitive, FromPrimitive)]
+#[repr(u16)]
+pub enum FormOfComposition {
+	/// an - Anthems
+	Anthems = (b"an"[0] as u16) << 8 | b"an"[1] as u16,
+	/// bd - Ballads
+	Ballads = (b"bd"[0] as u16) << 8 | b"bd"[1] as u16,
+	/// bg - Bluegrass music
+	Bluegrass = (b"bg"[0] as u16) << 8 | b"bg"[1] as u16,
+	/// bl - Blues
+	Blues = (b"bl"[0] as u16) << 8 | b"bl"[1] as u16,
+	/// bt - Ballets
+	Ballet = (b"bt"[0] as u16) << 8 | b"bt"[1] as u16,
+	/// ca - Chaconnes
+	Chaconne = (b"ca"[0] as u16) << 8 | b"ca"[1] as u16,
+	/// cb - Chants, Other religions
+	Chant = (b"cb"[0] as u16) << 8 | b"cb"[1] as u16,
+	/// cc - Chant, Christian
+	ChristianChant = (b"cc"[0] as u16) << 8 | b"cc"[1] as u16,
+	/// cg - Concerti grossi
+	Concerti = (b"cg"[0] as u16) << 8 | b"cg"[1] as u16,
+	/// ch - Chorales
+	Chorale = (b"ch"[0] as u16) << 8 | b"ch"[1] as u16,
+	/// cl - Chorale preludes
+	ChoralePrelude = (b"cl"[0] as u16) << 8 | b"cl"[1] as u16,
+	/// cn - Canons and rounds
+	Canon = (b"cn"[0] as u16) << 8 | b"cn"[1] as u16,
+	/// co - Concertos
+	Concerto = (b"co"[0] as u16) << 8 | b"co"[1] as u16,
+	/// cp - Chansons, polyphonic
+	Chanson = (b"cp"[0] as u16) << 8 | b"cp"[1] as u16,
+	/// cr - Carols
+	Carols = (b"cr"[0] as u16) << 8 | b"cr"[1] as u16,
+	/// cs - Chance compositions
+	Chance = (b"cs"[0] as u16) << 8 | b"cs"[1] as u16,
+	/// ct - Cantatas
+	Cantata = (b"ct"[0] as u16) << 8 | b"ct"[1] as u16,
+	/// cy - Country music
+	Country = (b"cy"[0] as u16) << 8 | b"cy"[1] as u16,
+	/// cz - Canzonas
+	Canzona = (b"cz"[0] as u16) << 8 | b"cz"[1] as u16,
+	/// df - Dance forms
+	Dance = (b"df"[0] as u16) << 8 | b"df"[1] as u16,
+	/// dv - Divertimentos, serenades, cassations, divertissements, and notturni
+	Divertimento = (b"dv"[0] as u16) << 8 | b"dv"[1] as u16,
+	/// fg - Fugues
+	Fugue = (b"fg"[0] as u16) << 8 | b"fg"[1] as u16,
+	/// fl - Flamenco
+	Flamenco = (b"fl"[0] as u16) << 8 | b"fl"[1] as u16,
+	/// fm - Folk music
+	Folk = (b"fm"[0] as u16) << 8 | b"fm"[1] as u16,
+	/// ft - Fantasias
+	Fantasia = (b"ft"[0] as u16) << 8 | b"ft"[1] as u16,
+	/// gm - Gospel music
+	Gospel = (b"gm"[0] as u16) << 8 | b"gm"[1] as u16,
+	/// hy - Hymns
+	Hymn = (b"hy"[0] as u16) << 8 | b"hy"[1] as u16,
+	/// jz - Jazz
+	Jazz = (b"jz"[0] as u16) << 8 | b"jz"[1] as u16,
+	/// mc - Musical revues and comedies
+	Musical = (b"mc"[0] as u16) << 8 | b"mc"[1] as u16,
+	/// md - Madrigals
+	Madrigal = (b"md"[0] as u16) << 8 | b"md"[1] as u16,
+	/// mi - Minuets
+	Minuet = (b"mi"[0] as u16) << 8 | b"mi"[1] as u16,
+	/// mo - Motets
+	Motet = (b"mo"[0] as u16) << 8 | b"mo"[1] as u16,
+	/// mp - Motion picture music
+	Motion = (b"mp"[0] as u16) << 8 | b"mp"[1] as u16,
+	/// mr - Marches
+	March = (b"mr"[0] as u16) << 8 | b"mr"[1] as u16,
+	/// ms - Masses
+	Mass = (b"ms"[0] as u16) << 8 | b"ms"[1] as u16,
+	/// mu - Multiple forms
+	Multiple = (b"mu"[0] as u16) << 8 | b"mu"[1] as u16,
+	/// mz - Mazurkas
+	Mazurka = (b"mz"[0] as u16) << 8 | b"mz"[1] as u16,
+	/// nc - Nocturnes
+	Nocturne = (b"nc"[0] as u16) << 8 | b"nc"[1] as u16,
+	/// nn - Not applicable
+	NotApplicable = (b"nn"[0] as u16) << 8 | b"nn"[1] as u16,
+	/// op - Operas
+	Opera = (b"op"[0] as u16) << 8 | b"op"[1] as u16,
+	/// or - Oratorios
+	Oratorio = (b"or"[0] as u16) << 8 | b"or"[1] as u16,
+	/// ov - Overtures
+	Overture = (b"ov"[0] as u16) << 8 | b"ov"[1] as u16,
+	/// pg - Program music
+	Program = (b"pg"[0] as u16) << 8 | b"pg"[1] as u16,
+	/// pm - Passion music
+	Passion = (b"pm"[0] as u16) << 8 | b"pm"[1] as u16,
+	/// po - Polonaises
+	Polonaise = (b"po"[0] as u16) << 8 | b"po"[1] as u16,
+	/// pp - Popular music
+	Popular = (b"pp"[0] as u16) << 8 | b"pp"[1] as u16,
+	/// pr - Preludes
+	Prelude = (b"pr"[0] as u16) << 8 | b"pr"[1] as u16,
+	/// ps - Passacaglias
+	Passacaglia = (b"ps"[0] as u16) << 8 | b"ps"[1] as u16,
+	/// pt - Part-songs
+	Part = (b"pt"[0] as u16) << 8 | b"pt"[1] as u16,
+	/// pv - Pavans
+	Pavan = (b"pv"[0] as u16) << 8 | b"pv"[1] as u16,
+	/// rc - Rock music
+	Rock = (b"rc"[0] as u16) << 8 | b"rc"[1] as u16,
+	/// rd - Rondos
+	Rondo = (b"rd"[0] as u16) << 8 | b"rd"[1] as u16,
+	/// rg - Ragtime music
+	Ragtime = (b"rg"[0] as u16) << 8 | b"rg"[1] as u16,
+	/// ri - Ricercars
+	Ricercar = (b"ri"[0] as u16) << 8 | b"ri"[1] as u16,
+	/// rp - Rhapsodies
+	Rhapsody = (b"rp"[0] as u16) << 8 | b"rp"[1] as u16,
+	/// rq - Requiems
+	Requiem = (b"rq"[0] as u16) << 8 | b"rq"[1] as u16,
+	/// sd - Square dance music
+	Square = (b"sd"[0] as u16) << 8 | b"sd"[1] as u16,
+	/// sg - Songs
+	Songs = (b"sg"[0] as u16) << 8 | b"sg"[1] as u16,
+	/// sn - Sonatas
+	Sonata = (b"sn"[0] as u16) << 8 | b"sn"[1] as u16,
+	/// sp - Symphonic poems
+	Symphonic = (b"sp"[0] as u16) << 8 | b"sp"[1] as u16,
+	/// st - Studies and exercises
+	Study = (b"st"[0] as u16) << 8 | b"st"[1] as u16,
+	/// su - Suites
+	Suite = (b"su"[0] as u16) << 8 | b"su"[1] as u16,
+	/// sy - Symphonies
+	Symphony = (b"sy"[0] as u16) << 8 | b"sy"[1] as u16,
+	/// tc - Toccatas
+	Toccata = (b"tc"[0] as u16) << 8 | b"tc"[1] as u16,
+	/// tl - Teatro lirico
+	Teatro = (b"tl"[0] as u16) << 8 | b"tl"[1] as u16,
+	/// ts - Trio-sonatas
+	TrioSonata = (b"ts"[0] as u16) << 8 | b"ts"[1] as u16,
+	/// uu - Unknown
+	Unknown = (b"uu"[0] as u16) << 8 | b"uu"[1] as u16,
+	/// vi - Villancicos
+	Villancico = (b"vi"[0] as u16) << 8 | b"vi"[1] as u16,
+	/// vr - Variations
+	Variation = (b"vr"[0] as u16) << 8 | b"vr"[1] as u16,
+	/// wz - Waltzes
+	Waltz = (b"wz"[0] as u16) << 8 | b"wz"[1] as u16,
+	/// za - Zarzuelas
+	Zarzuela = (b"za"[0] as u16) << 8 | b"za"[1] as u16,
+	/// zz - Other
+	Other = (b"zz"[0] as u16) << 8 | b"zz"[1] as u16,
+	/// || - No attempt to code
+	#[default]
+	NotCoded = (b"||"[0] as u16) << 8 | b"||"[1] as u16,
+}
+
+/// The format of the music.
+#[derive(Debug, Eq, PartialEq, IntoPrimitive, FromPrimitive)]
+#[repr(u8)]
+pub enum FormatOfMusic {
+	/// a - Full score
+	Full = b'a',
+	/// b - Miniature or study score
+	Miniature = b'b',
+	/// c - Accompaniment reduced for keyboard
+	Accompaniment = b'c',
+	/// d - Voice score with accompaniment omitted
+	Voice = b'd',
+	/// e - Condensed score or piano-conductor score
+	CondensedOrConductor = b'e',
+	/// g - Close score
+	Close = b'g',
+	/// h - Chorus score
+	Chorus = b'h',
+	/// i - Condensed score
+	Condensed = b'i',
+	/// j - Performer-conductor part
+	Performer = b'j',
+	/// k - Vocal score
+	Vocal = b'k',
+	/// l - Score
+	Score = b'l',
+	/// m - Multiple score formats
+	Multiple = b'm',
+	/// n - Not applicable
+	Not = b'n',
+	/// p - Piano score
+	Piano = b'p',
+	/// u - Unknown
+	Unknown = b'u',
+	/// z - Other
+	Other = b'z',
+	/// | - No attempt to code
+	#[default]
+	NotCoded = b'|',
+}
+
+/// The parts in the music.
+#[derive(Debug, Eq, PartialEq, IntoPrimitive, FromPrimitive)]
+#[repr(u8)]
+pub enum MusicParts {
+	/// # - No parts in hand or not specified
+	None = b'#',
+	/// d - Instrumental and vocal parts
+	InstrumentalAndVocal = b'd',
+	/// e - Instrumental parts
+	Instrumental = b'e',
+	/// f - Vocal parts
+	Vocal = b'f',
+	/// n - Not applicable
+	Not = b'n',
+	/// u - Unknown
+	Unknown = b'u',
+	/// | - No attempt to code
+	#[default]
+	NotCoded = b'|',
+}
+
+/// Matter accompanying the media.
+#[derive(Debug, Eq, PartialEq, IntoPrimitive, FromPrimitive)]
+#[repr(u8)]
+pub enum AccompanyingMatter {
+	/// # - No accompanying matter
+	None = b'#',
+	/// a - Discography
+	Discography = b'a',
+	/// b - Bibliography
+	Bibliography = b'b',
+	/// c - Thematic index
+	Thematic = b'c',
+	/// d - Libretto or text
+	Libretto = b'd',
+	/// e - Biography of composer or author
+	BiographyComposer = b'e',
+	/// f - Biography of performer or history of ensemble
+	BiographyPerformer = b'f',
+	/// g - Technical and/or historical information on instruments
+	TechnicalInstruments = b'g',
+	/// h - Technical information on music
+	TechnicalMusic = b'h',
+	/// i - Historical information
+	Historical = b'i',
+	/// k - Ethnological information
+	Ethnological = b'k',
+	/// r - Instructional materials
+	Instructional = b'r',
+	/// s - Music
+	Music = b's',
+	/// z - Other
+	Other = b'z',
+	/// | - No attempt to code
+	#[default]
+	NotCoded = b'|',
+}
+
+/// The type of literary text in the recording.
+#[derive(Debug, Eq, PartialEq, IntoPrimitive, FromPrimitive)]
+#[repr(u8)]
+pub enum MusicText {
+	/// # - Item is a music sound recording
+	Music = b'#',
+	/// a - Autobiography
+	Autobiography = b'a',
+	/// b - Biography
+	Biography = b'b',
+	/// c - Conference proceedings
+	Conference = b'c',
+	/// d - Drama
+	Drama = b'd',
+	/// e - Essays
+	Essays = b'e',
+	/// f - Fiction
+	Fiction = b'f',
+	/// g - Reporting
+	Reporting = b'g',
+	/// h - History
+	History = b'h',
+	/// i - Instruction
+	Instruction = b'i',
+	/// j - Language instruction
+	Language = b'j',
+	/// k - Comedy
+	Comedy = b'k',
+	/// l - Lectures, speeches
+	Lectures = b'l',
+	/// m - Memoirs
+	Memoirs = b'm',
+	/// n - Not applicable
+	Not = b'n',
+	/// o - Folktales
+	Folktales = b'o',
+	/// p - Poetry
+	Poetry = b'p',
+	/// r - Rehearsals
+	Rehearsals = b'r',
+	/// s - Sounds
+	Sounds = b's',
+	/// t - Interviews
+	Interviews = b't',
+	/// z - Other
+	Other = b'z',
+	/// | - No attempt to code
+	#[default]
+	NotCoded = b'|',
+}
+
+/// Whether the music is transposed or arranged.
+
+#[derive(Debug, Eq, PartialEq, IntoPrimitive, FromPrimitive)]
+#[repr(u8)]
+pub enum TranspositionArrangement {
+	/// # - Not arrangement or transposition or not specified
+	None = b'#',
+	/// a - Transposition
+	Transposition = b'a',
+	/// b - Arrangement
+	Arrangement = b'b',
+	/// c - Both transposed and arranged
+	Both = b'c',
+	/// n - Not applicable
+	NotApplicable = b'n',
+	/// u - Unknown
+	Unknown = b'u',
+	/// | - No attempt to code
+	#[default]
+	NotCoded = b'|',
+}
+
+/// The frequency at which a publication is published.
+#[derive(Debug, Eq, PartialEq, IntoPrimitive, FromPrimitive)]
+#[repr(u8)]
+pub enum Frequency {
+	/// # - No determinable frequency
+	None = b'#',
+	/// a - Annual
+	Annual = b'a',
+	/// b - Bimonthly
+	Bimonthly = b'b',
+	/// c - Semiweekly
+	Semiweekly = b'c',
+	/// d - Daily
+	Daily = b'd',
+	/// e - Biweekly
+	Biweekly = b'e',
+	/// f - Semiannual
+	Semiannual = b'f',
+	/// g - Biennial
+	Biennial = b'g',
+	/// h - Triennial
+	Triennial = b'h',
+	/// i - Three times a week
+	ThreeWeekly = b'i',
+	/// j - Three times a month
+	ThreeMonthly = b'j',
+	/// k - Continuously updated
+	Continuously = b'k',
+	/// m - Monthly
+	Monthly = b'm',
+	/// q - Quarterly
+	Quarterly = b'q',
+	/// s - Semimonthly
+	Semimonthly = b's',
+	/// t - Three times a year
+	Three = b't',
+	/// u - Unknown
+	Unknown = b'u',
+	/// w - Weekly
+	Weekly = b'w',
+	/// z - Other
+	Other = b'z',
+	/// | - No attempt to code
+	#[default]
+	NotCoded = b'|',
+}
+
+/// The regularity with which a publication is published.
+#[derive(Debug, Eq, PartialEq, IntoPrimitive, FromPrimitive)]
+#[repr(u8)]
+pub enum Regularity {
+	/// n - Normalized irregular
+	Normalized = b'n',
+	/// r - Regular
+	Regular = b'r',
+	/// u - Unknown
+	Unknown = b'u',
+	/// x - Completely irregular
+	Completely = b'x',
+	/// | - No attempt to code
+	#[default]
+	NotCoded = b'|',
+}
+
+/// The type of the periodic publication.
+#[derive(Debug, Eq, PartialEq, IntoPrimitive, FromPrimitive)]
+#[repr(u8)]
+pub enum PublicationType {
+	/// # - None of the following
+	None = b'#',
+	/// d - Updating database
+	UpdatingDatabase = b'd',
+	/// g - Magazine
+	Magazine = b'g',
+	/// h - Blog
+	Blog = b'h',
+	/// j - Journal
+	Journal = b'j',
+	/// l - Updating loose-leaf
+	UpdatingLooseLeaf = b'l',
+	/// m - Monographic series
+	Monographic = b'm',
+	/// n - Newspaper
+	Newspaper = b'n',
+	/// p - Periodical
+	Periodical = b'p',
+	/// r - Repository
+	Repository = b'r',
+	/// s - Newsletter
+	Newsletter = b's',
+	/// t - Directory
+	Directory = b't',
+	/// w - Updating Web site
+	UpdatingWeb = b'w',
+	/// | - No attempt to code
+	#[default]
+	NotCoded = b'|',
+}
+
+/// An alphabet or script.
+#[derive(Debug, Eq, PartialEq, IntoPrimitive, FromPrimitive)]
+#[repr(u8)]
+pub enum AlphabetScript {
+	/// # - No alphabet or script given/No key title
+	None = b'#',
+	/// a - Basic Roman
+	BasicRoman = b'a',
+	/// b - Extended Roman
+	ExtendedRoman = b'b',
+	/// c - Cyrillic
+	Cyrillic = b'c',
+	/// d - Japanese
+	Japanese = b'd',
+	/// e - Chinese
+	Chinese = b'e',
+	/// f - Arabic
+	Arabic = b'f',
+	/// g - Greek
+	Greek = b'g',
+	/// h - Hebrew
+	Hebrew = b'h',
+	/// i - Thai
+	Thai = b'i',
+	/// j - Devanagari
+	Devanagari = b'j',
+	/// k - Korean
+	Korean = b'k',
+	/// l - Tamil
+	Tamil = b'l',
+	/// u - Unknown
+	Unknown = b'u',
+	/// z - Other
+	Other = b'z',
+	/// | - No attempt to code
+	#[default]
+	NotCoded = b'|',
+}
+
+/// The convention according to which the publication is published.
+#[derive(Debug, Eq, PartialEq, IntoPrimitive, FromPrimitive)]
+#[repr(u8)]
+pub enum EntryConvention {
+	/// 0 - Successive entry
+	Successive = b'0',
+	/// 1 - Latest entry
+	Latest = b'1',
+	/// 2 - Integrated entry
+	Integrated = b'2',
 	/// | - No attempt to code
 	#[default]
 	NotCoded = b'|',
